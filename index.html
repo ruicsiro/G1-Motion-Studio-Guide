@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>G1 Motion Studio Guide</title>
+<meta name="description" content="How to make Unitree G1 motion clips in the lab scene with G1 Motion Studio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a lab manual - contents rail on the left, one reading column, screenshots a little wider than the text. */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #1a2130;
+  --muted: #586274;
+  --rule: #d9dee6;
+  --accent: #2a5ca5;
+  --accent-soft: #e5edf8;
+  --good: #2c7a4c;
+  --warn: #a8611c;
+  --code-bg: #eef1f5;
+  --font-display: "IBM Plex Sans Condensed", "Segoe UI", "Arial Narrow", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --step: 1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --surface: #1a1f28; --ink: #e4e8ef; --muted: #9ba5b4; --rule: #2b323e;
+    --accent: #8db3ee; --accent-soft: #1d2a3e; --good: #6cc38f; --warn: #e3a35d; --code-bg: #222934;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --surface: #1a1f28; --ink: #e4e8ef; --muted: #9ba5b4; --rule: #2b323e;
+  --accent: #8db3ee; --accent-soft: #1d2a3e; --good: #6cc38f; --warn: #e3a35d; --code-bg: #222934;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.6 var(--font-body);
+  padding-inline: 16px; padding-block: 0 64px;
+}
+.wrap { max-width: 74rem; margin: 0 auto; }
+.doc-head { padding-block: 40px 28px; border-bottom: 1px solid var(--rule); margin-bottom: 32px; }
+.eyebrow { font: 500 12px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h1 { font: 600 clamp(2rem, 4.5vw, 3rem)/1.1 var(--font-display); margin: 0 0 14px; text-wrap: balance; letter-spacing: -.01em; }
+.lede { font-size: 1.1rem; color: var(--muted); max-width: 44rem; margin: 0; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 20px 0 0; padding: 0; list-style: none; font: 400 13px/1.5 var(--font-mono); color: var(--muted); }
+.facts b { color: var(--ink); font-weight: 500; }
+
+.layout { display: grid; gap: 40px; }
+@media (min-width: 1000px) { .layout { grid-template-columns: 13.5rem minmax(0, 1fr); } }
+nav.toc { font-size: 14px; }
+@media (min-width: 1000px) { nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; } }
+nav.toc p { font: 500 12px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+nav.toc ol { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; }
+nav.toc a { color: var(--ink); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent); text-decoration: underline; }
+
+main { min-width: 0; }
+section { margin-bottom: 56px; scroll-margin-top: 16px; }
+h2 { font: 600 1.6rem/1.2 var(--font-display); margin: 0 0 6px; text-wrap: balance; }
+h2 .n { font: 500 .85rem/1 var(--font-mono); color: var(--accent); margin-right: 10px; vertical-align: .2em; }
+h3 { font: 600 1.1rem/1.3 var(--font-body); margin: 28px 0 6px; }
+p, ul, ol { max-width: 44rem; }
+p { margin: 0 0 12px; }
+ul, ol { padding-left: 1.3em; margin: 0 0 14px; }
+li { margin-bottom: 4px; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, kbd, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+kbd { display: inline-block; min-width: 1.6em; text-align: center; padding: 0 6px; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; background: var(--surface); line-height: 1.6; }
+.ui { font-weight: 600; }   /* names of buttons and fields in the app */
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 6px; overflow-x: auto; font: 400 13.5px/1.5 var(--font-mono); max-width: 44rem; margin: 0 0 14px; }
+
+figure { margin: 18px 0 26px; max-width: 62rem; }
+.shot { position: relative; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #0d0f13; }
+.shot img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; max-width: 44rem; }
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: #fff; border: 2px solid #fff;
+  font: 600 14px/24px var(--font-mono); text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.45);
+}
+:root[data-theme="dark"] .pin { color: #0e1622; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pin { color: #0e1622; } }
+
+.legend { list-style: none; padding: 0; display: grid; gap: 10px; max-width: 44rem; }
+.legend li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; margin: 0; }
+.legend .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--surface); font: 600 13px/24px var(--font-mono); text-align: center; }
+
+.steps { counter-reset: s; list-style: none; padding: 0; max-width: 44rem; }
+.steps > li { counter-increment: s; position: relative; padding-left: 40px; margin-bottom: 12px; }
+.steps > li::before { content: counter(s); position: absolute; left: 0; top: 1px; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font: 600 13px/23px var(--font-mono); text-align: center; }
+
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 44rem; margin: 0 0 16px; }
+.note.warn { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, var(--surface)); }
+.note p:last-child { margin-bottom: 0; }
+
+.table-wrap { overflow-x: auto; max-width: 62rem; margin: 0 0 18px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.4 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--code-bg); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.nowrap { white-space: nowrap; }
+.flag { font: 500 12.5px/1.4 var(--font-mono); color: var(--warn); white-space: nowrap; }
+.pass { font: 500 12.5px/1.4 var(--font-mono); color: var(--good); }
+footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="doc-head">
+    <p class="eyebrow">CSIRO Technology · Robotics motion data</p>
+    <h1>G1 Motion Studio Guide</h1>
+    <p class="lede">Make whole-body motion for the Unitree G1 humanoid in our lab scene: place objects, choose what the robot does to each, and get a 50&nbsp;Hz motion clip, a video and a MuJoCo replay. No Unity or Python needed.</p>
+    <ul class="facts">
+      <li><b>Runs on</b> Windows 10/11, 64-bit</li>
+      <li><b>Package</b> about 700&nbsp;MB unzipped</li>
+      <li><b>Output</b> CSV at 50&nbsp;Hz · MP4 · MuJoCo XML</li>
+    </ul>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Contents">
+      <p>Contents</p>
+      <ol>
+        <li><a href="#start">Getting started</a></li>
+        <li><a href="#screen">The screen</a></li>
+        <li><a href="#make">Making a motion</a></li>
+        <li><a href="#actions">Actions and limits</a></li>
+        <li><a href="#results">Checking the result</a></li>
+        <li><a href="#video">Video</a></li>
+        <li><a href="#files">Output files</a></li>
+        <li><a href="#mujoco">Replaying in MuJoCo</a></li>
+        <li><a href="#keys">Mouse and keys</a></li>
+        <li><a href="#trouble">Troubleshooting</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section id="start">
+        <h2><span class="n">01</span>Getting started</h2>
+        <ol class="steps">
+          <li>Unzip <code>G1MotionStudio.zip</code> into a folder you can write to, such as Documents or your desktop. Not <code>C:\Program Files</code>: the app saves its results next to itself.</li>
+          <li>Run <code>G1MotionStudio.exe</code>. Windows may say it protected your PC, because the app isn't code-signed. Choose <span class="ui">More info</span> &rsaquo; <span class="ui">Run anyway</span>.</li>
+          <li>The lab loads in 10–20 seconds, with the message <em>G1 Motion Studio – starting…</em> while it does.</li>
+          <li>To see a finished task first, click <span class="ui">Open…</span> and choose <code>Examples\lab_demo.json</code>. Then click <span class="ui">Generate motion</span>.</li>
+        </ol>
+        <p>The package folder contains:</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Item</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td class="nowrap"><code>G1MotionStudio.exe</code></td><td>The studio.</td></tr>
+            <tr><td class="nowrap"><code>MotionGen\</code></td><td>The motion generator and the lab model it plans in (<code>model.xml</code>).</td></tr>
+            <tr><td class="nowrap"><code>Examples\</code></td><td>A demo task: pick a cube, push a ball, twist a cylinder, open a cupboard door.</td></tr>
+            <tr><td class="nowrap"><code>Output\</code></td><td>Where results go, one folder per task.</td></tr>
+            <tr><td class="nowrap"><code>ffmpeg\</code></td><td>Video encoder used by <span class="ui">Render MP4</span> (FFmpeg, GPL licence).</td></tr>
+            <tr><td class="nowrap"><code>Guide\</code></td><td>This guide.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="screen">
+        <h2><span class="n">02</span>The screen</h2>
+        <figure>
+          <div class="shot">
+            <img src="img/overview.jpg" alt="G1 Motion Studio with the demo task open: the lab in 3D, the task panel on the left, the selected cube's settings on the right, and the generate bar at the bottom." width="1600" height="900">
+            <span class="pin" style="left:50%;top:1.7%">1</span>
+            <span class="pin" style="left:8.3%;top:62%">2</span>
+            <span class="pin" style="left:60%;top:58%">3</span>
+            <span class="pin" style="left:90%;top:62%">4</span>
+            <span class="pin" style="left:42%;top:93.2%">5</span>
+          </div>
+          <figcaption>The demo task (<code>Examples\lab_demo.json</code>) open, with the cube selected.</figcaption>
+        </figure>
+        <ul class="legend">
+          <li><span class="dot">1</span><div><b>Top bar.</b> The task name, which is also the name of its output folder. <span class="ui">New</span>, <span class="ui">Open…</span> and <span class="ui">Save…</span> work on task files (<code>.json</code>). <span class="ui">Log</span> shows the generator's output, <span class="ui">Report</span> the validation table, and <span class="ui">Help</span> (<kbd>F1</kbd>) a summary of the controls.</div></li>
+          <li><span class="dot">2</span><div><b>Task panel.</b> Where the robot starts, the list of targets in the order the robot visits them, and buttons to add a new shape or pick an object in the lab.</div></li>
+          <li><span class="dot">3</span><div><b>The lab.</b> Targets are drawn with a label (number, name, action). The green ring and arrow mark where the robot starts and which way it faces.</div></li>
+          <li><span class="dot">4</span><div><b>Target panel.</b> Appears when a target is selected: its shape and size, position, action, hand and the action's settings.</div></li>
+          <li><span class="dot">5</span><div><b>Bottom bar.</b> <span class="ui">Generate motion</span> and the status line, then playback controls, the output folder and video options once a motion exists.</div></li>
+        </ul>
+      </section>
+
+      <section id="make">
+        <h2><span class="n">03</span>Making a motion</h2>
+
+        <h3>Place the robot</h3>
+        <p>Click <span class="ui">Place robot…</span> and click the floor where the robot should start. Turn it with <span class="ui">−45°</span> / <span class="ui">+45°</span>, or type a heading in <span class="ui">facing</span>. The x and z fields hold the start position in metres. <span class="ui">idle at start / end</span> adds standing time before the first move and after the last.</p>
+        <figure>
+          <div class="shot"><img src="img/place-robot.jpg" alt="Placing the robot: a blue ring follows the mouse over the floor; the green ring and arrow show the current start." width="1600" height="900"></div>
+          <figcaption>Placing the robot. The blue ring follows the mouse; a click moves the start (green ring and arrow) there.</figcaption>
+        </figure>
+
+        <h3>Add targets</h3>
+        <p>There are two kinds of target.</p>
+        <ul>
+          <li><b>A shape.</b> Click Cube, Box, Sphere, Cylinder, Capsule, Cone, Pyramid or Door under <span class="ui">Add a shape</span>. The shape follows the mouse; click a bench to drop it there. Each shape starts with a suitable action, for example Pick for a cube and Push for a sphere.</li>
+          <li><b>An object in the lab.</b> Click <span class="ui">Pick scene object…</span>, move over the furniture (the part under the mouse is highlighted) and click. A part named as a door, such as the cupboard doors, becomes a door that the robot pulls open; it finds the handle and hinge itself. Anything else is handled as a box. The floor, walls and ceiling can't be picked.</li>
+        </ul>
+        <figure>
+          <div class="shot"><img src="img/pick-scene.jpg" alt="Picking a scene object: the left cupboard door is outlined under the mouse." width="1600" height="900"></div>
+          <figcaption>Picking an object in the lab. The highlighted part becomes the target when you click.</figcaption>
+        </figure>
+        <p>Click a target in the lab or in the list to select it. In the lab, drag a shape to move it, and turn it with <kbd>Q</kbd> / <kbd>E</kbd>. <kbd>Ctrl</kbd>+<kbd>D</kbd> duplicates it and <kbd>Del</kbd> removes it. Objects from the lab stay where they are; removing one only stops it being a target.</p>
+
+        <h3>Set what the robot does</h3>
+        <p>The target panel on the right holds the target's settings.</p>
+        <ul>
+          <li><span class="ui">Shape</span> and size in metres; for an object from the lab, its size comes from its mesh.</li>
+          <li><span class="ui">Placement</span>: position, turn, and <span class="ui">Rest on the surface below when generating</span>. When this is ticked, a shape only needs to be roughly on a bench and the generator sets it down on the surface.</li>
+          <li><span class="ui">Action</span> and <span class="ui">hand</span>, then the settings that action uses: lift height, hold time, distance, angle, number of pats, touch point or squeeze depth. See <a href="#actions">Actions and limits</a>.</li>
+          <li>For doors: <span class="ui">hinge</span> (Auto finds it opposite the handle) and the swing angle. Leave <span class="ui">hand</span> on <span class="ui">Auto</span>: the generator then uses the hand on the hinge side, which keeps hold of the handle through the whole swing.</li>
+        </ul>
+        <figure>
+          <div class="shot"><img src="img/target-panel.jpg" alt="The target panel for the left cupboard door: hinge Auto (found on the left edge), action Pull, hand Auto (chosen: left hand), swing 60 degrees." width="1600" height="900"></div>
+          <figcaption>The left cupboard door after generating: the hinge was found on its left edge and the left hand was chosen.</figcaption>
+        </figure>
+        <p>The list order is the order the robot works through the targets. Use <span class="ui">^</span> and <span class="ui">v</span> to change it. A target shown in orange has a setting that can't work, such as a box too big to pick up with one hand. Select it: the reason is shown at the bottom of the target panel.</p>
+
+        <h3>Generate</h3>
+        <p>Click <span class="ui">Generate motion</span>. The robot walks to each target, does its action and moves on. The status line shows progress, and <span class="ui">Log</span> shows the generator working target by target. A task with a few targets takes under a minute, validation included. <span class="ui">Cancel</span> stops it.</p>
+        <figure>
+          <div class="shot"><img src="img/generating.jpg" alt="Generation in progress with the Log window open, listing each target and the validation table." width="1600" height="900"></div>
+          <figcaption>Generating, with the Log open.</figcaption>
+        </figure>
+        <p>When it finishes, the motion plays back in the lab and the result is written to the output folder. If you change the task afterwards, the button becomes <span class="ui">Generate again</span>.</p>
+
+        <h3>Save and reuse tasks</h3>
+        <p><span class="ui">Save…</span> stores the task (robot start, targets, settings) as a <code>.json</code> file, and <span class="ui">Open…</span> loads one. Task files are small and can be shared. A copy of each generated task is also saved in its output folder as <code>&lt;task&gt;_studio.json</code>.</p>
+      </section>
+
+      <section id="actions">
+        <h2><span class="n">04</span>Actions and limits</h2>
+        <p>Every action is a complete episode: walk to a working position, reach, act, let go, and bring the arms back. The G1's hands have no finger joints, so a grasp holds an object between the palm and the curled fingers.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Action</th><th>Hands</th><th>What the robot does</th><th>Settings</th></tr></thead>
+          <tbody>
+            <tr><td>Pick</td><td>one</td><td>Grasps it from above, lifts, holds, puts it back.</td><td>lift height, hold time, keep holding at the end (last target only)</td></tr>
+            <tr><td>Lift</td><td>two</td><td>Palms on its left and right sides, lifts, holds, puts it back.</td><td>lift height, hold time</td></tr>
+            <tr><td>Push</td><td>one</td><td>Palm on the near side, slides it away (a sphere rolls). A door swings away.</td><td>distance; door: angle</td></tr>
+            <tr><td>Pull</td><td>one</td><td>Grasps it, or puts a palm on top of a larger object, and slides it closer. A door: grasps the handle and swings it open, stepping as it goes.</td><td>distance; door: angle</td></tr>
+            <tr><td>Twist</td><td>one</td><td>Grasps it, or puts a palm on top, and turns it about its vertical axis.</td><td>angle</td></tr>
+            <tr><td>Pat</td><td>one</td><td>Pats the top with the palm.</td><td>number of pats</td></tr>
+            <tr><td>Flip</td><td>one</td><td>Pushes its upper near side so it tips over away from the robot.</td><td>–</td></tr>
+            <tr><td>Touch</td><td>one</td><td>Touches a point with a fingertip and holds.</td><td>point (front, top, left, right), hold time</td></tr>
+            <tr><td>Squeeze</td><td>two</td><td>Palms on its left and right sides press in, and hold.</td><td>depth, hold time</td></tr>
+          </tbody>
+        </table></div>
+        <p><b>Limits.</b> The generator skips a target it can't do and says why, rather than making up a motion.</p>
+        <ul>
+          <li>One hand holds objects up to 13&nbsp;cm across. Two-hand actions need objects 10–55&nbsp;cm across.</li>
+          <li>Objects must be on a bench, within about 35&nbsp;cm of the edge the robot stands at. The robot can't crouch, so objects on the floor can't be handled.</li>
+          <li>Doors can be pushed, pulled or touched. A cupboard door opens toward its handle, so use Pull.</li>
+          <li>A sphere can't be flipped; push it to roll it.</li>
+          <li>The lab is fixed: it is the scene as it was when the package was built. Furniture can't be moved.</li>
+        </ul>
+      </section>
+
+      <section id="results">
+        <h2><span class="n">05</span>Checking the result</h2>
+        <p>Every motion is checked against the real lab geometry before you see it. The status line shows <span class="pass">PASS</span>, or <span class="flag">FLAGS</span> when something needs a look, followed by the frame count, the clip length and how long generation took. Skipped targets are counted there too.</p>
+        <figure>
+          <div class="shot"><img src="img/review.jpg" alt="Playback paused while the robot holds the right cupboard door open; the bottom bar shows PASS, the timeline at 28.46 s, and door_R: pull / step." width="1600" height="900"></div>
+          <figcaption>Playback. The label beside the speed buttons shows the current target, action and phase.</figcaption>
+        </figure>
+        <p><b>Playback.</b> <span class="ui">Play</span>/<span class="ui">Pause</span> (<kbd>Space</kbd>), <span class="ui">|&lt;</span> back to the start, drag the timeline to scrub, and step with the arrow keys (<kbd>Shift</kbd> for 1&nbsp;s steps). <span class="ui">0.25x</span> to <span class="ui">2x</span> set the speed. Clicking the task panels returns to editing.</p>
+        <p><b>Report.</b> The <span class="ui">Report</span> window lists every segment of the motion (walk, turn, then each target's reach, grasp, pull and so on) with measured clearances and errors in millimetres. A flagged segment ends with <span class="flag">&lt;-- FLAG</span>. Any warnings are listed under the table.</p>
+        <figure>
+          <div class="shot"><img src="img/report.jpg" alt="The validation report window: one row per motion segment with clearances, hand error and joint speed." width="1600" height="900"></div>
+          <figcaption>The validation report.</figcaption>
+        </figure>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Flag</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="flag">BODY IN FURNITURE</td><td>The body goes more than 3&nbsp;mm into furniture.</td></tr>
+            <tr><td class="flag">HAND IN FURNITURE</td><td>A hand goes more than 5&nbsp;mm into furniture.</td></tr>
+            <tr><td class="flag">OBJECT IN FURNITURE</td><td>The target object goes into furniture.</td></tr>
+            <tr><td class="flag">ARM/BODY IN OBJECT</td><td>The arm or body passes through a target object, for example a door it has already opened.</td></tr>
+            <tr><td class="flag">HAND IN OBJECT</td><td>A hand presses into an object further than the action allows.</td></tr>
+            <tr><td class="flag">HAND OFF TARGET</td><td>While working on the object, the hand is more than 5&nbsp;cm from where it should be, so the action isn't really happening. For a door, set <span class="ui">hand</span> to Auto.</td></tr>
+            <tr><td class="flag">JOINT SPIKE</td><td>A joint moves faster than 6&nbsp;rad/s.</td></tr>
+          </tbody>
+        </table></div>
+        <p>A flagged motion is still saved, so you can look at it. Usually a small change fixes it: move the target, turn the robot's start, change the hand, or reorder the targets.</p>
+      </section>
+
+      <section id="video">
+        <h2><span class="n">06</span>Video</h2>
+        <p>Once a motion exists, the right of the bottom bar has the video options.</p>
+        <ul>
+          <li><span class="ui">720p</span> or <span class="ui">1080p</span>: the video size.</li>
+          <li><span class="ui">Follow robot</span> keeps the camera behind the robot. <span class="ui">This view</span> keeps the camera where you have put it.</li>
+          <li><span class="ui">+ replay CSV</span> also records the clip as replayed in MuJoCo, with the link poses as simulated.</li>
+          <li><span class="ui">Render MP4</span> plays the clip once and records every frame at 50&nbsp;fps. <span class="ui">Cancel video</span> stops it.</li>
+        </ul>
+        <figure>
+          <div class="shot"><img src="img/video.jpg" alt="Rendering a video: the bottom bar shows Rendering frame 493 / 2755 and a Cancel video button." width="1600" height="900"></div>
+          <figcaption>Rendering an MP4 from the current view. A 55-second clip took under a minute.</figcaption>
+        </figure>
+      </section>
+
+      <section id="files">
+        <h2><span class="n">07</span>Output files</h2>
+        <p>Each task gets a folder named after it inside the output folder (by default <code>Output\</code> next to the app). <span class="ui">Open folder</span> opens it.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>File</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td class="nowrap"><code>&lt;task&gt;.csv</code></td><td>The motion at 50&nbsp;Hz in Unity coordinates (y up): the current target, action and phase, root pose, the 29 joint angles (rad) and velocities, both hand positions, which object each hand touches, and each target object's pose. The <code>.json</code> lists the columns.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;.json</code></td><td>Metadata: targets and where they ended up, validation results, warnings.</td></tr>
+            <tr><td class="nowrap"><code>report.txt</code></td><td>The validation table.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;_studio.json</code></td><td>The task, for <span class="ui">Open…</span>.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;_task.yaml</code></td><td>The task as the generator read it.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;_scene.xml</code></td><td>A MuJoCo model of the lab with the G1 and the task's targets, at the first frame. Textures are in <code>textures\</code>.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;_mujoco.csv</code></td><td>The motion in that model's frame (z up): pelvis and target poses, and joint angles in MuJoCo's order.</td></tr>
+            <tr><td class="nowrap"><code>replay_mujoco.py</code></td><td>Plays the two above in MuJoCo's viewer.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;.mp4</code></td><td>The video, after <span class="ui">Render MP4</span>.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;_replay_*.csv</code></td><td>With <span class="ui">+ replay CSV</span>: the clip as replayed in MuJoCo.</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note"><p>Generating a task again with the same name replaces its folder's files. Give a task a new name in the top bar to keep both.</p></div>
+      </section>
+
+      <section id="mujoco">
+        <h2><span class="n">08</span>Replaying in MuJoCo</h2>
+        <p>The MuJoCo files run anywhere MuJoCo's Python package is installed, without the studio. Copy the task folder, including <code>textures\</code>, then:</p>
+<pre>pip install mujoco
+cd Output\open_door
+python replay_mujoco.py
+python replay_mujoco.py --speed 0.5 --loop</pre>
+        <p>The robot's pelvis and the target objects are mocap bodies, driven from the CSV; the joints are set from it each frame. The model also carries a keyframe named <code>start</code> holding the first frame.</p>
+        <figure>
+          <div class="shot"><img src="img/mujoco.jpg" alt="The exported scene in MuJoCo: the G1 has opened both cupboard doors." width="1280" height="720"></div>
+          <figcaption>The two-door example replayed in MuJoCo.</figcaption>
+        </figure>
+      </section>
+
+      <section id="keys">
+        <h2><span class="n">09</span>Mouse and keys</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Input</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td class="nowrap">Right-drag</td><td>Orbit the camera.</td></tr>
+            <tr><td class="nowrap">Right-drag + <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>Q</kbd> <kbd>E</kbd></td><td>Fly the camera.</td></tr>
+            <tr><td class="nowrap">Middle-drag, or <kbd>Shift</kbd> + right-drag</td><td>Pan.</td></tr>
+            <tr><td class="nowrap">Wheel</td><td>Zoom.</td></tr>
+            <tr><td class="nowrap"><kbd>F</kbd></td><td>Frame the selected target. Double-clicking it in the list does the same.</td></tr>
+            <tr><td class="nowrap">Drag a shape</td><td>Move it.</td></tr>
+            <tr><td class="nowrap"><kbd>Q</kbd> / <kbd>E</kbd></td><td>Turn the selected shape (<kbd>Shift</kbd>: 5° steps).</td></tr>
+            <tr><td class="nowrap"><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Duplicate the selected target.</td></tr>
+            <tr><td class="nowrap"><kbd>Del</kbd></td><td>Remove the selected target.</td></tr>
+            <tr><td class="nowrap"><kbd>Esc</kbd></td><td>Cancel placing or picking.</td></tr>
+            <tr><td class="nowrap"><kbd>Space</kbd></td><td>Play or pause.</td></tr>
+            <tr><td class="nowrap"><kbd>←</kbd> / <kbd>→</kbd></td><td>Step one frame (<kbd>Shift</kbd>: 1&nbsp;s).</td></tr>
+            <tr><td class="nowrap"><kbd>F1</kbd></td><td>Show or hide Help.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="trouble">
+        <h2><span class="n">10</span>Troubleshooting</h2>
+        <h3>A target was skipped</h3>
+        <p>The status line counts skipped targets, and the Log and Report give the reason, for example "too big for one hand", "out of reach" or "inside the furniture". Change what it says and generate again.</p>
+        <h3>The robot loses a door handle</h3>
+        <p>Set the door's <span class="ui">hand</span> to Auto. With the hand on the far side of the hinge, the robot has to turn a long way while holding the door. The generator warns about this in the report.</p>
+        <h3>Render MP4 isn't available</h3>
+        <p>The video options need <code>ffmpeg\ffmpeg.exe</code> in the package. Unzip the whole package again if it's missing.</p>
+        <h3>Results don't appear</h3>
+        <p>Check that the package is in a folder you can write to. The output path is shown at the bottom of the window and can be changed there.</p>
+        <h3>Something else went wrong</h3>
+        <p>The app's log is at <code>%USERPROFILE%\AppData\LocalLow\DefaultCompany\G1 Motion Studio\Player.log</code>. Send it with the task's <code>_studio.json</code> to Rui Wang.</p>
+      </section>
+
+      <footer>G1 Motion Studio · CSIRO Technology · Guide written October 2026 for the studio build of the same month.</footer>
+    </main>
+  </div>
+</div>
+</body>
+</html>
