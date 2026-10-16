@@ -154,6 +154,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; 
           <li><b>Smoother arms.</b> Fixed a jitter where a wrist or elbow near its joint limit flicked back and forth by about 5&deg; many times a second, and uneven speed during reaches.</li>
           <li><b>A file for controllers.</b> <code>&lt;task&gt;_g1.csv</code> holds the robot's motion for Unitree's model, ready to load as its <code>qpos</code>: see <a href="#files">Output files</a> and <a href="#mujoco">Replaying in MuJoCo</a>.</li>
           <li><b>Balance in the report.</b> A ZMP column and an <span class="flag">OFF BALANCE</span> flag: see <a href="#results">Checking the result</a>.</li>
+          <li><b>Objects inside furniture.</b> The fume cupboard, the sink bench, the wall shelves, the tall cupboard and the drawer units now collide as their real shape instead of a solid block, so an object placed on a work surface or shelf inside them stays there. Before, it dropped to the floor and was skipped.</li>
           <li><b>Linux version</b> for Ubuntu 22.04 and newer: see <a href="#start">Getting started</a>.</li>
         </ul>
         <p>Still to do: fast arm reaches can push the ZMP outside the feet for a few frames (reported, not flagged), and the arms aren't yet kept off the torso. Generating takes about 1.6&times; as long as before.</p>
@@ -278,7 +279,7 @@ cd G1MotionStudio
         <p><b>Limits.</b> The generator skips a target it can't do and says why, rather than making up a motion.</p>
         <ul>
           <li>One hand holds objects up to 13&nbsp;cm across. Two-hand actions need objects 10–55&nbsp;cm across.</li>
-          <li>Objects must be on a bench, within about 35&nbsp;cm of the edge the robot stands at. The robot can't crouch, so objects on the floor can't be handled.</li>
+          <li>Objects must be on a bench, a work surface or a shelf, within about 35&nbsp;cm of the edge the robot stands at. The robot can't crouch, so objects on the floor can't be handled, and it can't lean over a bench to the shelves on the wall behind it.</li>
           <li>Doors can be pushed, pulled or touched. A cupboard door opens toward its handle, so use Pull.</li>
           <li>A sphere can't be flipped; push it to roll it.</li>
           <li>The lab is fixed: it is the scene as it was when the package was built. Furniture can't be moved.</li>
