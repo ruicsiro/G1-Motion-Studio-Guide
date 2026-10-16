@@ -123,7 +123,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; 
     <h1>G1 Motion Studio Guide</h1>
     <p class="lede">Make whole-body motion for the Unitree G1 humanoid in our lab scene: place objects, choose what the robot does to each, and get a 50&nbsp;Hz motion clip, a video and a MuJoCo replay. No Unity or Python needed.</p>
     <ul class="facts">
-      <li><b>Runs on</b> Windows 10/11, 64-bit</li>
+      <li><b>Runs on</b> Windows 10/11 or Linux (Ubuntu 22.04+), 64-bit</li>
       <li><b>Package</b> about 700&nbsp;MB unzipped</li>
       <li><b>Output</b> CSV at 50&nbsp;Hz · MP4 · MuJoCo XML</li>
     </ul>
@@ -147,6 +147,18 @@ footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; 
     </nav>
 
     <main>
+      <div class="note" id="new">
+        <p><b>What's new · 16 October 2026</b></p>
+        <ul>
+          <li><b>Balanced walking.</b> The walk is now planned so a real G1 could do it: the centre of mass follows a path that keeps the balance point (ZMP) on the feet, corrected for the swinging legs, and the back foot rolls onto its toes before it lifts. Checked on Unitree's own <code>g1_29dof.xml</code>, the demo's walking keeps the ZMP inside the feet in 99.8% of frames (it was outside in 81%), and no motor goes over its torque limit while walking (it needed up to 2.4&times;).</li>
+          <li><b>Smoother arms.</b> Fixed a jitter where a wrist or elbow near its joint limit flicked back and forth by about 5&deg; many times a second, and uneven speed during reaches.</li>
+          <li><b>A file for controllers.</b> <code>&lt;task&gt;_g1.csv</code> holds the robot's motion for Unitree's model, ready to load as its <code>qpos</code>: see <a href="#files">Output files</a> and <a href="#mujoco">Replaying in MuJoCo</a>.</li>
+          <li><b>Balance in the report.</b> A ZMP column and an <span class="flag">OFF BALANCE</span> flag: see <a href="#results">Checking the result</a>.</li>
+          <li><b>Linux version</b> for Ubuntu 22.04 and newer: see <a href="#start">Getting started</a>.</li>
+        </ul>
+        <p>Still to do: fast arm reaches can push the ZMP outside the feet for a few frames (reported, not flagged), and the arms aren't yet kept off the torso. Generating takes about 1.6&times; as long as before.</p>
+      </div>
+
       <section id="start">
         <h2><span class="n">01</span>Getting started</h2>
         <ol class="steps">
@@ -155,6 +167,13 @@ footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; 
           <li>The lab loads in 10–20 seconds, with the message <em>G1 Motion Studio – starting…</em> while it does.</li>
           <li>To see a finished task first, click <span class="ui">Open…</span> and choose <code>Examples\lab_demo.json</code>. Then click <span class="ui">Generate motion</span>.</li>
         </ol>
+        <div class="note">
+          <p><b>On Linux</b> (64-bit, glibc 2.35 or newer: Ubuntu 22.04+, Debian 12+, Fedora 36+), use <code>G1MotionStudio-Linux.tar.gz</code>:</p>
+<pre>tar xzf G1MotionStudio-Linux.tar.gz
+cd G1MotionStudio
+./G1MotionStudio.x86_64</pre>
+          <p>For <span class="ui">Render MP4</span>, install FFmpeg (<code>sudo apt install ffmpeg</code>). The Save and Open dialogs use zenity or kdialog; without either, the studio asks for the file's path itself. Everything else works as on Windows, with <code>/</code> in place of <code>\</code> in paths (for example <code>MotionGen/generate</code>).</p>
+        </div>
         <p>The package folder contains:</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Item</th><th>What it is</th></tr></thead>
@@ -289,6 +308,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; 
             <tr><td class="flag">HAND IN OBJECT</td><td>A hand presses into an object further than the action allows.</td></tr>
             <tr><td class="flag">HAND OFF TARGET</td><td>While working on the object, the hand is more than 5&nbsp;cm from where it should be, so the action isn't really happening. For a door, set <span class="ui">hand</span> to Auto.</td></tr>
             <tr><td class="flag">JOINT SPIKE</td><td>A joint moves faster than 6&nbsp;rad/s.</td></tr>
+            <tr><td class="flag">OFF BALANCE</td><td>While walking, turning or stepping, the balance point (ZMP) is more than 2&nbsp;cm outside the feet for longer than 0.1&nbsp;s: a real G1 couldn't walk it as given. The report's ZMP column shows each phase's worst margin in mm (negative is outside); arm movements are reported there but not flagged.</td></tr>
           </tbody>
         </table></div>
         <p>A flagged motion is still saved, so you can look at it. Usually a small change fixes it: move the target, turn the robot's start, change the hand, or reorder the targets.</p>
@@ -323,6 +343,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 13px; 
             <tr><td class="nowrap"><code>&lt;task&gt;_scene.xml</code></td><td>A MuJoCo model of the lab with the G1 and the task's targets, at the first frame. Textures are in <code>textures\</code>.</td></tr>
             <tr><td class="nowrap"><code>&lt;task&gt;_mujoco.csv</code></td><td>The motion in that model's frame (z up): pelvis and target poses, and joint angles in MuJoCo's order.</td></tr>
             <tr><td class="nowrap"><code>replay_mujoco.py</code></td><td>Plays the two above in MuJoCo's viewer.</td></tr>
+            <tr><td class="nowrap"><code>&lt;task&gt;_g1.csv</code></td><td>The robot's motion for Unitree's own <code>g1_29dof.xml</code>, as a reference for a controller: time, pelvis position and quaternion (w,&nbsp;x,&nbsp;y,&nbsp;z), the 29 joints under Unitree's names and in its order, then a planted flag for each foot. Columns 1&ndash;36 are that model's <code>qpos</code>.</td></tr>
             <tr><td class="nowrap"><code>&lt;task&gt;.mp4</code></td><td>The video, after <span class="ui">Render MP4</span>.</td></tr>
             <tr><td class="nowrap"><code>&lt;task&gt;_replay_*.csv</code></td><td>With <span class="ui">+ replay CSV</span>: the clip as replayed in MuJoCo.</td></tr>
           </tbody>
@@ -338,6 +359,14 @@ cd Output\open_door
 python replay_mujoco.py
 python replay_mujoco.py --speed 0.5 --loop</pre>
         <p>The robot's pelvis and the target objects are mocap bodies, driven from the CSV; the joints are set from it each frame. The model also carries a keyframe named <code>start</code> holding the first frame.</p>
+        <p>For a controller working with Unitree's model, use <code>&lt;task&gt;_g1.csv</code> instead. Every row loads straight into <code>g1_29dof.xml</code>:</p>
+<pre>import mujoco, numpy as np
+m = mujoco.MjModel.from_xml_path("g1_29dof.xml")
+d = mujoco.MjData(m)
+rows = np.loadtxt("open_door_g1.csv", delimiter=",", skiprows=1)
+d.qpos[:] = rows[0, 1:37]       # pelvis xyz, quaternion wxyz, 29 joints
+mujoco.mj_forward(m, d)</pre>
+        <p>The walking is planned for balance: the centre of mass follows an inverted-pendulum path that keeps the ZMP on the feet, corrected for the swinging legs' momentum, and the trailing foot rolls onto its toes before it lifts. Arm movements aren't balance-planned yet.</p>
         <figure>
           <div class="shot"><img src="img/mujoco.jpg" alt="The exported scene in MuJoCo: the G1 has opened both cupboard doors." width="1280" height="720"></div>
           <figcaption>The two-door example replayed in MuJoCo.</figcaption>
@@ -373,14 +402,14 @@ python replay_mujoco.py --speed 0.5 --loop</pre>
         <h3>The robot loses a door handle</h3>
         <p>Set the door's <span class="ui">hand</span> to Auto. With the hand on the far side of the hinge, the robot has to turn a long way while holding the door. The generator warns about this in the report.</p>
         <h3>Render MP4 isn't available</h3>
-        <p>The video options need <code>ffmpeg\ffmpeg.exe</code> in the package. Unzip the whole package again if it's missing.</p>
+        <p>On Windows, the video options need <code>ffmpeg\ffmpeg.exe</code> in the package. Unzip the whole package again if it's missing. On Linux, install FFmpeg (<code>sudo apt install ffmpeg</code>).</p>
         <h3>Results don't appear</h3>
         <p>Check that the package is in a folder you can write to. The output path is shown at the bottom of the window and can be changed there.</p>
         <h3>Something else went wrong</h3>
-        <p>The app's log is at <code>%USERPROFILE%\AppData\LocalLow\DefaultCompany\G1 Motion Studio\Player.log</code>. Send it with the task's <code>_studio.json</code> to Rui Wang.</p>
+        <p>The app's log is at <code>%USERPROFILE%\AppData\LocalLow\DefaultCompany\G1 Motion Studio\Player.log</code> on Windows, or <code>~/.config/unity3d/DefaultCompany/G1 Motion Studio/Player.log</code> on Linux. Send it with the task's <code>_studio.json</code> to Rui Wang.</p>
       </section>
 
-      <footer>G1 Motion Studio · CSIRO Technology · Guide written October 2026 for the studio build of the same month.</footer>
+      <footer>G1 Motion Studio · CSIRO Technology · Guide updated 16 October 2026 for the studio build of the same day.</footer>
     </main>
   </div>
 </div>
